@@ -4,18 +4,97 @@
  * and open the template in the editor.
  */
 package codigo;
-
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.sql.Connection;
+import javax.imageio.ImageIO;
+import java.sql.DriverManager;
+import java.util.HashMap;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import javax.swing.ImageIcon;
 /**
  *
  * @author xp
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
-
+    Connection conexion; //almacena la conexion a la BBDD
+    
+    Statement estado; //almacena el estado de la conexión
+    
+    ResultSet resultado; //almacena el resultado de la query a la BBDD
+    
+    String[][] arrayResultado;
+    int posi = 0;
+    BufferedImage plantilla = null;
+    private int ancho = 210, alto = 210;
+    private int contador = 0;
+    int total_pokemons = 0;
+    private ResultSet resultadoConsulta;
+    
+    
+    HashMap <String,Pokemon> listaPokemons = new HashMap();
+    
+    
+    
+    
+    
     /**
      * Creates new form VentanaPrincipal
      */
     public VentanaPrincipal() {
         initComponents();
+        try{
+            plantilla = ImageIO.read(getClass().getResource("/imagenes/black-white.png"));
+        }
+        catch (IOException e){}
+   
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            conexion = DriverManager.getConnection("jdbc:mysql://127.0.0.1/pokemon","root","root");
+            estado = conexion.createStatement();
+            resultadoConsulta = estado.executeQuery("Select * from pokemon");
+            //cargo el resultado de la query en mi hashmap
+            while (resultadoConsulta.next()){
+                Pokemon p = new Pokemon();
+                p.nombre = resultadoConsulta.getString("name");
+                p.generation_id = resultadoConsulta.getInt(5);
+                p.evolution_chain_id = resultadoConsulta.getInt(6);
+                p.species = resultadoConsulta.getString(12);
+                p.height = resultadoConsulta.getInt(10);
+                p.weight = resultadoConsulta.getInt(11);
+                listaPokemons.put(resultadoConsulta.getString(1), p);
+            }
+        }
+        catch (Exception e){
+        }
+        total_pokemons = listaPokemons.size();
+        ImagenesP.setIcon(devuelveElPokemonQueEstaEnLaPosicion(0));
+        escribeDatos();
+    }
+     private void escribeDatos(){
+        Pokemon p = listaPokemons.get(String.valueOf(contador+1));
+        if (p != null){
+            Nombre2.setText(p.nombre);
+            Altura2.setText("" + p.height);
+            Anchura2.setText("" + p.weight);
+            Tipo2.setText(p.species);
+            Evolucion2.setText("" + p.evolution_chain_id);
+            Generacion2.setText("" + p.generation_id);
+        }
+        else {
+            Nombre2.setText("NO HAY DATOS");
+        }
+    }
+    
+    private ImageIcon devuelveElPokemonQueEstaEnLaPosicion (int posicion){
+        int columna = posicion / 30;
+        int fila = posicion % 30;
+        return ( new ImageIcon(plantilla.getSubimage(fila*96+1, columna*96+1, 96, 96)
+                .getScaledInstance(ancho, alto, Image.SCALE_DEFAULT)));  
     }
 
     /**
@@ -30,6 +109,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         ImagenesP = new javax.swing.JLabel();
         Prev = new javax.swing.JLabel();
         Next = new javax.swing.JLabel();
+        Generacion1 = new javax.swing.JLabel();
+        Generacion2 = new javax.swing.JLabel();
+        Evolucion1 = new javax.swing.JLabel();
+        Evolucion2 = new javax.swing.JLabel();
         Contador = new javax.swing.JLabel();
         Nombre1 = new javax.swing.JLabel();
         Nombre2 = new javax.swing.JLabel();
@@ -66,6 +149,24 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
         });
         getContentPane().add(Next, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 470, 100, 30));
+
+        Generacion1.setForeground(new java.awt.Color(255, 255, 255));
+        Generacion1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Generacion1.setText("GENERACIÓN:");
+        getContentPane().add(Generacion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 80, 20));
+
+        Generacion2.setForeground(new java.awt.Color(255, 255, 255));
+        Generacion2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(Generacion2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 460, 30, 20));
+
+        Evolucion1.setForeground(new java.awt.Color(255, 255, 255));
+        Evolucion1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Evolucion1.setText("EVOLUCIÓN:");
+        getContentPane().add(Evolucion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 490, 80, 20));
+
+        Evolucion2.setForeground(new java.awt.Color(255, 255, 255));
+        Evolucion2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(Evolucion2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 490, 30, 20));
         getContentPane().add(Contador, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 120, 50));
 
         Nombre1.setForeground(new java.awt.Color(255, 255, 255));
@@ -117,11 +218,18 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void PrevMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_PrevMousePressed
-        // TODO add your handling code here:
+        contador--;
+        if (contador < 0) {contador = 0;}
+        //dibujaElPokemonQueEstaEnLaPosicion(contador);
+        ImagenesP.setIcon(devuelveElPokemonQueEstaEnLaPosicion(contador));
+         escribeDatos();
     }//GEN-LAST:event_PrevMousePressed
 
     private void NextMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NextMousePressed
-        // TODO add your handling code here:
+       contador++;
+        if (contador > total_pokemons) {contador = 0;}
+         ImagenesP.setIcon(devuelveElPokemonQueEstaEnLaPosicion(contador));
+          escribeDatos();
     }//GEN-LAST:event_NextMousePressed
 
     /**
@@ -166,6 +274,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Anchura2;
     private javax.swing.JLabel Contador;
     private javax.swing.JLabel EtiquetaI;
+    private javax.swing.JLabel Evolucion1;
+    private javax.swing.JLabel Evolucion2;
+    private javax.swing.JLabel Generacion1;
+    private javax.swing.JLabel Generacion2;
     private javax.swing.JLabel ImagenesP;
     private javax.swing.JLabel Info;
     private javax.swing.JLabel Next;
