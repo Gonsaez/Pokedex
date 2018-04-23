@@ -16,4 +16,6 @@ public class Pokemon {
     public String species="";
     public int height = 0;
     public int weight = 0;
+    public String habitat ="";
+    public String color ="";
 }

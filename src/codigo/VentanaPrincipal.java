@@ -12,10 +12,9 @@ import javax.imageio.ImageIO;
 import java.sql.DriverManager;
 import java.util.HashMap;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import javax.swing.ImageIcon;
+import java.applet.AudioClip;
 /**
  *
  * @author xp
@@ -47,6 +46,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public VentanaPrincipal() {
         initComponents();
+        AudioClip sonido;
+        sonido = java.applet.Applet.newAudioClip(getClass().getResource("/codigo/pokemon.wav"));
+        sonido.play();
         try{
             plantilla = ImageIO.read(getClass().getResource("/imagenes/black-white.png"));
         }
@@ -66,6 +68,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 p.species = resultadoConsulta.getString(12);
                 p.height = resultadoConsulta.getInt(10);
                 p.weight = resultadoConsulta.getInt(11);
+                p.habitat = resultadoConsulta.getString(15);
+                p.color = resultadoConsulta.getString(13);
                 listaPokemons.put(resultadoConsulta.getString(1), p);
             }
         }
@@ -84,6 +88,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             Tipo2.setText(p.species);
             Evolucion2.setText("" + p.evolution_chain_id);
             Generacion2.setText("" + p.generation_id);
+            Habitat2.setText(p.habitat);
+            Color2.setText(p.color);
         }
         else {
             Nombre2.setText("NO HAY DATOS");
@@ -114,6 +120,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         Evolucion1 = new javax.swing.JLabel();
         Evolucion2 = new javax.swing.JLabel();
         Contador = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         Nombre1 = new javax.swing.JLabel();
         Nombre2 = new javax.swing.JLabel();
         Altura1 = new javax.swing.JLabel();
@@ -122,7 +130,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         Anchura2 = new javax.swing.JLabel();
         Tipo1 = new javax.swing.JLabel();
         Tipo2 = new javax.swing.JLabel();
-        EtiquetaI = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        Habitat1 = new javax.swing.JLabel();
+        Habitat2 = new javax.swing.JLabel();
+        Color1 = new javax.swing.JLabel();
+        Color2 = new javax.swing.JLabel();
         Info = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -130,6 +142,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         getContentPane().add(ImagenesP, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 180, 230, 150));
 
         Prev.setBackground(new java.awt.Color(255, 255, 255));
+        Prev.setFont(new java.awt.Font("Pokemon Hollow", 0, 24)); // NOI18N
         Prev.setForeground(new java.awt.Color(255, 255, 255));
         Prev.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Prev.setText("PREV");
@@ -140,6 +153,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
         getContentPane().add(Prev, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 470, 100, 30));
 
+        Next.setFont(new java.awt.Font("Pokemon Hollow", 0, 24)); // NOI18N
         Next.setForeground(new java.awt.Color(255, 255, 255));
         Next.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Next.setText("NEXT");
@@ -150,15 +164,17 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
         getContentPane().add(Next, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 470, 100, 30));
 
+        Generacion1.setFont(new java.awt.Font("Pokemon Hollow", 1, 12)); // NOI18N
         Generacion1.setForeground(new java.awt.Color(255, 255, 255));
         Generacion1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Generacion1.setText("GENERACIÓN:");
-        getContentPane().add(Generacion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 80, 20));
+        getContentPane().add(Generacion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 90, 20));
 
         Generacion2.setForeground(new java.awt.Color(255, 255, 255));
         Generacion2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(Generacion2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 460, 30, 20));
+        getContentPane().add(Generacion2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 460, 20, 20));
 
+        Evolucion1.setFont(new java.awt.Font("Pokemon Hollow", 1, 11)); // NOI18N
         Evolucion1.setForeground(new java.awt.Color(255, 255, 255));
         Evolucion1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Evolucion1.setText("EVOLUCIÓN:");
@@ -169,47 +185,64 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         getContentPane().add(Evolucion2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 490, 30, 20));
         getContentPane().add(Contador, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 120, 50));
 
-        Nombre1.setForeground(new java.awt.Color(255, 255, 255));
-        Nombre1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Nombre1.setText("NOMBRE:");
-        getContentPane().add(Nombre1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 190, 60, 20));
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel1MousePressed(evt);
+            }
+        });
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 410, 60, 10));
 
-        Nombre2.setForeground(new java.awt.Color(255, 255, 255));
-        Nombre2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(Nombre2, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 190, 110, 20));
+        jPanel1.setBackground(new java.awt.Color(0, 204, 102));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        Altura1.setForeground(new java.awt.Color(255, 255, 255));
-        Altura1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Altura1.setText("ALTURA:");
-        getContentPane().add(Altura1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 210, 60, 20));
+        Nombre1.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        Nombre1.setText("Nombre:");
+        jPanel1.add(Nombre1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 80, 30));
 
-        Altura2.setForeground(new java.awt.Color(255, 255, 255));
-        Altura2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(Altura2, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 210, 90, 20));
+        Nombre2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jPanel1.add(Nombre2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 14, 160, 20));
 
-        Anchura1.setForeground(new java.awt.Color(240, 240, 240));
-        Anchura1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Anchura1.setText("ANCHURA:");
-        getContentPane().add(Anchura1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 230, 80, 20));
+        Altura1.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        Altura1.setText("Altura:");
+        jPanel1.add(Altura1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 70, 20));
 
-        Anchura2.setForeground(new java.awt.Color(255, 255, 255));
-        Anchura2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(Anchura2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 230, 110, 20));
+        Altura2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jPanel1.add(Altura2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 50, 100, 20));
 
-        Tipo1.setForeground(new java.awt.Color(255, 255, 255));
-        Tipo1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Anchura1.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        Anchura1.setText("Anchura:");
+        jPanel1.add(Anchura1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 90, 30));
+
+        Anchura2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jPanel1.add(Anchura2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 84, 90, 20));
+
+        Tipo1.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
         Tipo1.setText("Tipo:");
-        getContentPane().add(Tipo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 250, 60, 20));
+        jPanel1.add(Tipo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 50, 20));
 
-        Tipo2.setForeground(new java.awt.Color(240, 240, 240));
-        Tipo2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        getContentPane().add(Tipo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 250, 110, 20));
+        Tipo2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jPanel1.add(Tipo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 120, 100, 20));
 
-        EtiquetaI.setFont(new java.awt.Font("Comic Sans MS", 1, 14)); // NOI18N
-        EtiquetaI.setForeground(new java.awt.Color(240, 240, 240));
-        EtiquetaI.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        EtiquetaI.setText("INFO");
-        getContentPane().add(EtiquetaI, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 210, 50, 40));
+        jLabel2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("INFO");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 74, 50, 30));
+
+        Habitat1.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        Habitat1.setText("Habitat:");
+        jPanel1.add(Habitat1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, -1, -1));
+
+        Habitat2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jPanel1.add(Habitat2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, 100, 20));
+
+        Color1.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        Color1.setText("Color:");
+        jPanel1.add(Color1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, -1, 20));
+
+        Color2.setFont(new java.awt.Font("Pokemon Hollow", 0, 18)); // NOI18N
+        jPanel1.add(Color2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 180, 120, 20));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 180, 260, 210));
 
         Info.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/pokedex.png"))); // NOI18N
         getContentPane().add(Info, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 11, -1, -1));
@@ -231,6 +264,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
          ImagenesP.setIcon(devuelveElPokemonQueEstaEnLaPosicion(contador));
           escribeDatos();
     }//GEN-LAST:event_NextMousePressed
+
+    private void jLabel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MousePressed
+        
+    }//GEN-LAST:event_jLabel1MousePressed
 
     /**
      * @param args the command line arguments
@@ -259,6 +296,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         }
         //</editor-fold>
 
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -272,12 +310,15 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Altura2;
     private javax.swing.JLabel Anchura1;
     private javax.swing.JLabel Anchura2;
+    private javax.swing.JLabel Color1;
+    private javax.swing.JLabel Color2;
     private javax.swing.JLabel Contador;
-    private javax.swing.JLabel EtiquetaI;
     private javax.swing.JLabel Evolucion1;
     private javax.swing.JLabel Evolucion2;
     private javax.swing.JLabel Generacion1;
     private javax.swing.JLabel Generacion2;
+    private javax.swing.JLabel Habitat1;
+    private javax.swing.JLabel Habitat2;
     private javax.swing.JLabel ImagenesP;
     private javax.swing.JLabel Info;
     private javax.swing.JLabel Next;
@@ -286,5 +327,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Prev;
     private javax.swing.JLabel Tipo1;
     private javax.swing.JLabel Tipo2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
